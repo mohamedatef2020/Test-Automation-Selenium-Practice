@@ -1,30 +1,32 @@
-package practiceTests;
+package googleTests;
 
+import googlePages.HomePage;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class TestClass {
-    WebDriver driver;
+    private WebDriver driver;
+    private googlePages.HomePage HomePage;
 
     @BeforeClass
-    public void beforeClass(){
+    private void beforeClass(){
         WebDriverManager.chromedriver().setup();
     }
 
     @BeforeMethod
-    public void beforeMethod(){
+    private void beforeMethod(){
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        driver.navigate().to("https://www.google.com/ncr");
     }
 
     @AfterMethod
-    public void afterMethod(){
+    private void afterMethod(){
         driver.quit();
     }
     /**
@@ -35,8 +37,12 @@ public class TestClass {
      Close Google Chrome
      **/
     @Test
-    public void assertPageTitleIsCorrect(){
-        Assert.assertEquals(driver.getTitle(), "Google");
+    private void assertPageTitleIsCorrect(){
+        var currentPageTitle = new HomePage(driver)
+                .visit()
+                .getTitle();
+
+        Assert.assertEquals(currentPageTitle, "Google");
     }
 
     /**
@@ -47,8 +53,12 @@ public class TestClass {
     Close Google Chrome
     **/
     @Test
-    public void assertLogoIsDisplayed(){
-        Assert.assertTrue(driver.findElement(By.xpath("//img[@alt='Google']")).isDisplayed());
+    private void assertLogoIsDisplayed(){
+        var isLogoDisplayed = new HomePage(driver)
+                .visit()
+                .isLogoDisplayed();
+
+        Assert.assertTrue(isLogoDisplayed);
     }
 
     /**
@@ -60,9 +70,13 @@ public class TestClass {
      Close Google Chrome
      **/
     @Test
-    public void assertFirstSearchResultContent(){
-        driver.findElement(By.name("q")).sendKeys("Selenium WebDriver" + Keys.ENTER);
-        Assert.assertEquals(driver.findElement(By.xpath("(//a/h3)[1]")).getText(), "Selenium - Web Browser Automation");
+    private void assertFirstSearchResultContent(){
+    var firstResultText = new HomePage(driver)
+            .visit()
+            .searchForQuery("Selenium - Web Browser Automation")
+            .getFirstResultText();
+
+    Assert.assertEquals(firstResultText, "Selenium - Web Browser Automation");
     }
 
 }
